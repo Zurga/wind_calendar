@@ -1,0 +1,9 @@
+<main class="container">
+  <div>
+    <section>
+      <div id="info"><%= Phoenix.Flash.get(@flash, :info) %></div>
+      <div id="error"><%= Phoenix.Flash.get(@flash, :error) %></div>
+    </section>
+    <%= @inner_content %>
+  </div>
+</main>
