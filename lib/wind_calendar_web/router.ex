@@ -25,6 +25,7 @@ defmodule WindCalendarWeb.Router do
       pipe_through :browser
       live "/", IndexLive, :index
       # TODO add your routes here
+      get "/spot", SpotController, :spot
     end
   end
 
