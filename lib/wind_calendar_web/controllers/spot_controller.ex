@@ -94,7 +94,8 @@ defmodule WindCalendarWeb.SpotController do
     serialized = Magical.Serializer.serialize(calendar)
 
     conn
-    |> text(serialized)
+    |> put_resp_content_type("text/calendar")
+    |> send_resp(200, serialized)
   end
 
   def forecast_url(lat, lon) do

@@ -10,15 +10,15 @@ defmodule WindCalendar.Application do
   def start(_type, _args) do
     children = [
       WindCalendarWeb.Telemetry,
-      WindCalendar.Repo,
+      # WindCalendar.Repo,
       {DNSCluster, query: Application.get_env(:wind_calendar, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: WindCalendar.PubSub},
       # Start the Finch HTTP client for sending emails
       {Finch, name: WindCalendar.Finch},
-      {EctoSync,
-        repo: WindCalendar.Repo,
-        cache_name: :live_cache,
-        watchers: []},
+      # {EctoSync,
+      #  repo: WindCalendar.Repo,
+      #  cache_name: :live_cache,
+      #  watchers: []},
       # Start a worker by calling: WindCalendar.Worker.start_link(arg)
       # {WindCalendar.Worker, arg},
       # Start to serve requests, typically the last entry
