@@ -1,6 +1,6 @@
 defmodule WindCalendar.MixProject do
   use Mix.Project
-  
+
   @test_envs ~w/test integration_test/a
 
   def project do
@@ -57,7 +57,6 @@ defmodule WindCalendar.MixProject do
       {:floki, ">= 0.30.0", only: :test},
       {:phoenix_live_dashboard, "~> 0.8.3"},
       {:esbuild, "~> 0.8", runtime: Mix.env() == :dev},
-      
       {:swoosh, "~> 1.5"},
       {:finch, "~> 0.13"},
       {:telemetry_metrics, "~> 0.6"},
@@ -74,7 +73,7 @@ defmodule WindCalendar.MixProject do
       {:typed_ecto_schema, "~> 0.4.1"},
       {:flop, "~> 0.25.0"},
       {:deps_nix, "~> 2.0", only: :dev},
-      
+      {:magical, "~> 1.0.1"},
 
       # Testing deps
       {:skipper, "~> 0.3.0", only: @test_envs},
@@ -88,7 +87,7 @@ defmodule WindCalendar.MixProject do
       # Local catalogue
       "priv/catalogue",
       # Dependencies catalogues
-      "deps/surface/priv/catalogue",
+      "deps/surface/priv/catalogue"
     ]
   end
 
@@ -122,7 +121,7 @@ defmodule WindCalendar.MixProject do
     args = if(IO.ANSI.enabled?(), do: ["--color" | args], else: ["--no-color" | args])
     IO.puts("==> Running tests with MIX_ENV=#{env}")
 
-    ~w/compile assets.build/ ++ [["test" | args]]
+    (~w/compile assets.build/ ++ [["test" | args]])
     |> Enum.reduce_while(0, fn command, res ->
       if res > 0 do
         {:halt, System.at_exit(fn _ -> exit({:shutdown, 1}) end)}
@@ -132,6 +131,7 @@ defmodule WindCalendar.MixProject do
             into: IO.binstream(:stdio, :line),
             env: [{"MIX_ENV", env}]
           )
+
         {:cont, res}
       end
     end)
