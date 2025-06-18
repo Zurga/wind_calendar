@@ -126,7 +126,7 @@ defmodule WindCalendarWeb.IndexLive do
         },
         socket
       ) do
-    [lat, lon] = String.split(latlon || ",", ",")
+    [lat, lon] = String.split((latlon != "" && latlon) || ",", ",")
 
     wind_directions =
       Map.get(params, "wind_directions", [])
