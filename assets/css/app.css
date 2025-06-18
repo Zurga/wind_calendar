@@ -3,6 +3,10 @@
 @import url("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
 #map { height: 50vh; }
 
+#wind-directions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
 #map [role="button"]:not(.leaflet-control-zoom-in):not(.leaflet-control-zoom-out) {
   all: initial;
 }

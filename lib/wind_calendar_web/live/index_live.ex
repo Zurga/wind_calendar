@@ -1,117 +1,113 @@
 defmodule WindCalendarWeb.IndexLive do
   use WindCalendarWeb.LiveView
 
+  alias WindCalendar.Directions
   alias Surface.Components.Form
-  alias Surface.Components.Form.{Checkbox, Field, Select, HiddenInput, Label, NumberInput}
 
-  @wind_direction_icon %{
-    # North
-    0 => %{"into" => "↑", "follow" => "↓", "abbreviation" => "N"},
-    # North-Northeast
-    1 => %{"into" => "↑↗", "follow" => "↓↙", "abbreviation" => "NNE"},
-    # Northeast
-    2 => %{"into" => "↗", "follow" => "↙", "abbreviation" => "NE"},
-    # East-Northeast
-    3 => %{"into" => "→↗", "follow" => "←↙", "abbreviation" => "ENE"},
-    # East
-    4 => %{"into" => "→", "follow" => "←", "abbreviation" => "E"},
-    # East-Southeast
-    5 => %{"into" => "→↘", "follow" => "←↖", "abbreviation" => "ESE"},
-    # Southeast
-    6 => %{"into" => "↘", "follow" => "↖", "abbreviation" => "SE"},
-    # South-Southeast
-    7 => %{"into" => "↓↘", "follow" => "↑↖", "abbreviation" => "SSE"},
-    # South
-    8 => %{"into" => "↓", "follow" => "↑", "abbreviation" => "S"},
-    # South-Southwest
-    9 => %{"into" => "↓↙", "follow" => "↑↗", "abbreviation" => "SSW"},
-    # Southwest
-    10 => %{"into" => "↙", "follow" => "↗", "abbreviation" => "SW"},
-    # West-Southwest
-    11 => %{"into" => "←↙", "follow" => "→↗", "abbreviation" => "WSW"},
-    # West
-    12 => %{"into" => "←", "follow" => "→", "abbreviation" => "W"},
-    # West-Northwest
-    13 => %{"into" => "←↖", "follow" => "→↘", "abbreviation" => "WNW"},
-    # Northwest
-    14 => %{"into" => "↖", "follow" => "↘", "abbreviation" => "NW"},
-    # North-Northwest
-    15 => %{"into" => "↑↖", "follow" => "↓↘", "abbreviation" => "NNW"}
+  alias Surface.Components.Form.{
+    Checkbox,
+    Field,
+    Select,
+    HiddenInput,
+    Label,
+    NumberInput,
+    TextInput
   }
 
   def mount(_, _, socket) do
+    initial_form =
+      url_form(%{
+        "unit" => "ms",
+        "min_speed" => 0,
+        "max_speed" => 90,
+        "wind_directions" => nil,
+        "indicator_direction" => "follow"
+      })
+
     {:ok,
      socket
-     |> assign(
-       form:
-         to_form(
-           %{"unit" => "ms", "min_speed" => nil, "max_speed" => nil, "wind_directions" => nil},
-           as: :url_form
-         )
-         |> IO.inspect(label: :form)
-     )
-     |> assign(url: nil)
-     |> assign(wind_direction_icon: @wind_direction_icon)}
+     |> assign(form: initial_form, url: nil, wind_direction_icon: Directions.directions())}
   end
 
   def render(assigns) do
     ~F"""
-    <Form for={@form} change="generate-url">
-      <div id="map" :hook="Leaflet" phx-update="ignore">
-        <Field name={:latlng}>
-          <HiddenInput />
-        </Field>
-      </div>
-      <fieldset>
-        <Field name={:unit}>
-          <Label>Wind speed unit</Label>
-          <Select options={[{"kn (Knots)", "kn"}, {"m/s", "ms"}, {"mph", "mph"}]} />
-        </Field>
-        <Field name={:indicator_direction}>
-          <Label>Wind indicator direction</Label>
-          <Select options={~w/follow into abbreviation/} />
-        </Field>
-        <Field name={:wind_directions}>
-          {#for {value, label_map} <- @wind_direction_icon}
-            <Label>{label_map["abbreviation"]}</Label>
-            {#if is_nil(@form[:wind_directions].value)}
-              <input
-                type="checkbox"
-                name="url_form[wind_directions][]"
-                id={"url_form_wind_directions-#{value}"}
-                value={value}
-                checked
-              />
-            {#else}
-              <input
-                type="checkbox"
-                name="url_form[wind_directions][]"
-                id={"url_form_wind_directions-#{value}"}
-                value={value}
-                checked={to_string(value) in @form[:wind_directions].value}
-              />
-            {/if}
-          {/for}
-        </Field>
-        <Field name={:min_speed}>
-          <Label>Minimal windspeed</Label>
+    <article>
+      <header><strong>Create a wind calendar for your spot</strong></header>
+      <Form for={@form} change="generate-url">
+        <div id="map" :hook="Leaflet" phx-update="ignore">
+          <Field name={:latlng}>
+            <HiddenInput />
+          </Field>
+        </div>
+        <label>Copy this url to create a new calendar</label>
+        {#if !@url}
+          <p aria-busy="true">Click a location on the map</p>
+        {#else}
           <fieldset role="group">
-            <NumberInput />
-            <button disabled>{@form[:unit].value}</button>
+            <TextInput value={@url} } />
+            <button type="button" id="url-copy-button" :hook="Copy" data-value={@url}>Copy</button>
           </fieldset>
-        </Field>
-        <Field name={:max_speed}>
-          <Label>Maximum windspeed</Label>
-          <fieldset role="group">
-            <NumberInput />
-            <button disabled>{@form[:unit].value}</button>
-          </fieldset>
-        </Field>
-      </fieldset>
-    </Form>
-    <pre :if={@url}>
-      {@url}
-    </pre>
+        {/if}
+        <fieldset>
+          <Field name={:indicator_direction}>
+            <Label>Wind indicator direction</Label>
+            <Select options={[
+              {"Following the wind (N): ↓", "follow"},
+              {"Into the wind (N): ↑", "into"},
+              {"Abbreviation: N", "abbreviation"}
+            ]} />
+          </Field>
+          <Field name={:wind_directions}>
+            <Label>Wind directions:</Label>
+            <div id="wind-directions">
+              {#for {value, label_map} <- @wind_direction_icon}
+                <Label>
+                  {#if is_nil(@form[:wind_directions].value)}
+                    <input
+                      type="checkbox"
+                      name="url_form[wind_directions][]"
+                      id={"url_form_wind_directions-#{value}"}
+                      value={value}
+                      checked
+                    />
+                  {#else}
+                    <input
+                      type="checkbox"
+                      name="url_form[wind_directions][]"
+                      id={"url_form_wind_directions-#{value}"}
+                      value={value}
+                      checked={to_string(value) in @form[:wind_directions].value}
+                    />
+                  {/if}
+                  {label_map[@form[:indicator_direction].value]}
+                  {#if @form[:indicator_direction].value != "abbreviation"}
+                    ({label_map["abbreviation"]})
+                  {/if}
+                </Label>
+              {/for}
+            </div>
+          </Field>
+          <Field name={:unit}>
+            <Label>Wind speed unit:</Label>
+            <Select options={[{"kn (Knots)", "kn"}, {"m/s", "ms"}, {"mph", "mph"}]} />
+          </Field>
+          <Field name={:min_speed}>
+            <Label>Minimum windspeed:</Label>
+            <fieldset role="group">
+              <NumberInput />
+              <button disabled>{@form[:unit].value}</button>
+            </fieldset>
+          </Field>
+          <Field name={:max_speed}>
+            <Label>Maximum windspeed:</Label>
+            <fieldset role="group">
+              <NumberInput />
+              <button disabled>{@form[:unit].value}</button>
+            </fieldset>
+          </Field>
+        </fieldset>
+      </Form>
+    </article>
     """
   end
 
@@ -145,14 +141,12 @@ defmodule WindCalendarWeb.IndexLive do
 
     {:noreply,
      socket
-     |> assign(url: url)
-     |> assign(form: to_form(params, as: "url_form") |> IO.inspect(label: :changed))}
+     |> assign(url: url, form: url_form(params))}
   end
 
-  defp generate_url(lat, lon, unit, indicator_direction) do
-  end
+  defp url_form(params), do: to_form(params, as: :url_form)
 
-  defp maybe_append(params, key, ""), do: params
+  defp maybe_append(params, _key, ""), do: params
 
   defp maybe_append(params, key, value) when is_list(value) do
     params <> "&#{Enum.map_join(value, "&", &"#{key}[]=#{&1}")}"

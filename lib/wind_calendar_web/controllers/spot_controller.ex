@@ -1,42 +1,9 @@
 defmodule WindCalendarWeb.SpotController do
   use WindCalendarWeb.Controller
 
+  alias WindCalendar.Directions
   alias Magical.{Calendar, Event}
   @all_wind_directions 0..15
-  @wind_direction_icon %{
-    # North
-    0 => %{"into" => "↑", "follow" => "↓", "abbreviation" => "N"},
-    # North-Northeast
-    1 => %{"into" => "↑↗", "follow" => "↓↙", "abbreviation" => "NNE"},
-    # Northeast
-    2 => %{"into" => "↗", "follow" => "↙", "abbreviation" => "NE"},
-    # East-Northeast
-    3 => %{"into" => "→↗", "follow" => "←↙", "abbreviation" => "ENE"},
-    # East
-    4 => %{"into" => "→", "follow" => "←", "abbreviation" => "E"},
-    # East-Southeast
-    5 => %{"into" => "→↘", "follow" => "←↖", "abbreviation" => "ESE"},
-    # Southeast
-    6 => %{"into" => "↘", "follow" => "↖", "abbreviation" => "SE"},
-    # South-Southeast
-    7 => %{"into" => "↓↘", "follow" => "↑↖", "abbreviation" => "SSE"},
-    # South
-    8 => %{"into" => "↓", "follow" => "↑", "abbreviation" => "S"},
-    # South-Southwest
-    9 => %{"into" => "↓↙", "follow" => "↑↗", "abbreviation" => "SSW"},
-    # Southwest
-    10 => %{"into" => "↙", "follow" => "↗", "abbreviation" => "SW"},
-    # West-Southwest
-    11 => %{"into" => "←↙", "follow" => "→↗", "abbreviation" => "WSW"},
-    # West
-    12 => %{"into" => "←", "follow" => "→", "abbreviation" => "W"},
-    # West-Northwest
-    13 => %{"into" => "←↖", "follow" => "→↘", "abbreviation" => "WNW"},
-    # Northwest
-    14 => %{"into" => "↖", "follow" => "↘", "abbreviation" => "NW"},
-    # North-Northwest
-    15 => %{"into" => "↑↖", "follow" => "↓↘", "abbreviation" => "NNW"}
-  }
 
   def spot(
         conn,
@@ -50,7 +17,7 @@ defmodule WindCalendarWeb.SpotController do
 
     min_speed = Map.get(params, "min_speed", "0") |> String.to_integer()
     max_speed = Map.get(params, "max_speed", "9999") |> String.to_integer()
-    wind_arrow = Map.get(params, "indicator_direction", "follow")
+    wind_direction_format = Map.get(params, "indicator_direction", "follow")
     # ms, kn, mph 
     unit = Map.get(params, "unit", "ms")
 
@@ -79,7 +46,8 @@ defmodule WindCalendarWeb.SpotController do
         if time.hour > 8 and time.hour < 20 and wind_speed > min_speed and wind_speed < max_speed and
              wind_direction in acceptable_wind_directions do
           event = %Event{
-            summary: "#{trunc(wind_speed)} #{@wind_direction_icon[wind_direction][wind_arrow]}",
+            summary:
+              "#{trunc(wind_speed)} #{Direction.as_string(wind_direction, wind_direction_format)}",
             dtstart: datetime,
             dtend: datetime
           }
