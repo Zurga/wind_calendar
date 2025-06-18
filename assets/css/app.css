@@ -2,3 +2,12 @@
 @import url("./pico.css");
 @import url("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
 #map { height: 50vh; }
+
+#map [role="button"]:not(.leaflet-control-zoom-in):not(.leaflet-control-zoom-out) {
+  all: initial;
+}
+
+.leaflet-control-zoom-in,  
+.leaflet-control-zoom-out  {
+  all: initial;
+}
