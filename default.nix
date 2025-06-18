@@ -3,24 +3,17 @@ let
   beamPackages = pkgs.beamPackages;
   inherit (beamPackages) mixRelease;
   # Uncomment to use a git repo to pull in the source
-  # src = builtins.fetchGit {
-  #   url = "git@host/repo.git";
-  #   rev = commit;
-  #   ref = branch;
-  # };
-
-  # This will use the current directory as source
-  fs = pkgs.lib.fileset;
-  src = fs.toSource {
-    root = ./.;
-    fileset = fs.difference ./. ( fs.unions [ (fs.maybeMissing ./result) ./deps ./_build ]);
+  src = builtins.fetchGit {
+    url = "git@github.com:Zurga/wind_calendar.git";
+    rev = commit;
+    ref = branch;
   };
-
   mixNixDeps = pkgs.callPackages "${src}/deps.nix" {
     overrides = final: prev: {  };
   };
 
-  # nodeDependencies = (pkgs.callPackage "${src}/assets/default.nix" { }).shell.nodeDependencies;
+  # This will use the current directory as source
+  nodeDependencies = (pkgs.callPackage "${src}/assets/default.nix" { }).shell.nodeDependencies;
 in 
 mixRelease {
   inherit src mixNixDeps;
@@ -36,8 +29,8 @@ mixRelease {
 
 
   # Re-add the following line to postBuild if you have nodeDependencies
-  # ln -sf ${nodeDependencies}/lib/node_modules assets/node_modules
   postBuild = ''
+    ln -sf ${nodeDependencies}/lib/node_modules assets/node_modules
     cp ${pkgs.esbuild}/bin/esbuild _build/esbuild-linux-x64
 
     # for external task you need a workaround for the no deps check flag

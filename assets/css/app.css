@@ -1,2 +1,4 @@
 /* This file is for your main application CSS */
 @import url("./pico.css");
+@import url("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
+#map { height: 50vh; }

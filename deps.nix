@@ -1324,7 +1324,7 @@ let
 
       punkix =
         let
-          version = "e8dfea74a5fb62c91bd6fb7da9e238a5a405298b";
+          version = "9a5610baf8b680f4936671efe2e9bd7b33f51735";
           drv = buildMix {
             inherit version;
             name = "punkix";
@@ -1333,8 +1333,8 @@ let
             src = pkgs.fetchFromGitHub {
               owner = "Zurga";
               repo = "punkix";
-              rev = "e8dfea74a5fb62c91bd6fb7da9e238a5a405298b";
-              hash = "sha256-r4RWAVHqcG4XxEB/GOjKtbiTCX5Hep9oGFSNfwGER8c=";
+              rev = "9a5610baf8b680f4936671efe2e9bd7b33f51735";
+              hash = "sha256-5fkeJjH9pZpXe3p33Ur+m87LKPX3GfT1DhCu3ixo0Ss=";
             };
 
             beamDeps = [
