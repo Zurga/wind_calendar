@@ -31,6 +31,8 @@ config :wind_calendar, WindCalendarWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :wind_calendar, WindCalendar.Mailer, adapter: Swoosh.Adapters.Local
 
+config :tzdata, :data_dir, "/tmp"
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",
