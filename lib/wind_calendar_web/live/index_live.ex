@@ -44,7 +44,7 @@ defmodule WindCalendarWeb.IndexLive do
           <p aria-busy="true">Click a location on the map</p>
         {#else}
           <fieldset role="group">
-            <TextInput value={@url} } />
+            <TextInput value={@url} />
             <button type="button" id="url-copy-button" :hook="Copy" data-value={@url}>Copy</button>
           </fieldset>
         {/if}
@@ -126,18 +126,23 @@ defmodule WindCalendarWeb.IndexLive do
         },
         socket
       ) do
-    [lat, lon] = String.split((latlon != "" && latlon) || ",", ",")
+    url =
+      if latlon == "" do
+        nil
+      else
+        [lat, lon] = String.split(latlon, ",")
 
-    wind_directions =
-      Map.get(params, "wind_directions", [])
+        wind_directions =
+          Map.get(params, "wind_directions", [])
 
-    url_params =
-      "unit=#{unit}&lat=#{lat}&lon=#{lon}&indicator_direction=#{indicator_direction}"
-      |> maybe_append("min_speed", min_speed)
-      |> maybe_append("max_speed", max_speed)
-      |> maybe_append("wind_direction", wind_directions)
+        url_params =
+          "unit=#{unit}&lat=#{lat}&lon=#{lon}&indicator_direction=#{indicator_direction}"
+          |> maybe_append("min_speed", min_speed)
+          |> maybe_append("max_speed", max_speed)
+          |> maybe_append("wind_direction", wind_directions)
 
-    url = "https://#{WindCalendarWeb.Endpoint.host()}/spot?#{url_params}"
+        "https://#{WindCalendarWeb.Endpoint.host()}/spot?#{url_params}"
+      end
 
     {:noreply,
      socket
