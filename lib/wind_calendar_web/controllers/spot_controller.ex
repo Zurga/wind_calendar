@@ -47,7 +47,7 @@ defmodule WindCalendarWeb.SpotController do
              wind_direction in acceptable_wind_directions do
           event = %Event{
             summary:
-              "#{trunc(wind_speed)} #{Direction.as_string(wind_direction, wind_direction_format)}",
+              "#{trunc(wind_speed)} #{Directions.as_string(wind_direction, wind_direction_format)}",
             dtstart: datetime,
             dtend: datetime
           }
