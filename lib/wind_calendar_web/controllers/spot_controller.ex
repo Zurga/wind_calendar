@@ -38,10 +38,6 @@ defmodule WindCalendarWeb.SpotController do
     15 => %{"into" => "↑↖", "follow" => "↓↘", "abbreviation" => "NNW"}
   }
 
-  def spot(conn, %{"special" => spec}) do
-    text(conn, spec)
-  end
-
   def spot(
         conn,
         %{"lat" => lat, "lon" => lon} = params
@@ -55,6 +51,8 @@ defmodule WindCalendarWeb.SpotController do
     min_speed = Map.get(params, "min_speed", "0") |> String.to_integer()
     max_speed = Map.get(params, "max_speed", "9999") |> String.to_integer()
     wind_arrow = Map.get(params, "indicator_direction", "follow")
+    # ms, kn, mph 
+    unit = Map.get(params, "unit", "ms")
 
     {:ok,
      %{
@@ -65,7 +63,7 @@ defmodule WindCalendarWeb.SpotController do
            "wind_direction_10m" => wind_directions
          }
        }
-     }} = Req.get(forecast_url(lat, lon))
+     }} = Req.get(forecast_url(lat, lon, unit))
 
     calendar =
       Enum.map(datetimes, fn datetime_string ->
@@ -98,8 +96,8 @@ defmodule WindCalendarWeb.SpotController do
     |> text(serialized)
   end
 
-  def forecast_url(lat, lon) do
-    "https://api.open-meteo.com/v1/forecast?latitude=#{lat}&longitude=#{lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=knmi_harmonie_arome_netherlands&timezone=Europe%2FBerlin&wind_speed_unit=kn"
+  def forecast_url(lat, lon, unit) do
+    "https://api.open-meteo.com/v1/forecast?latitude=#{lat}&longitude=#{lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=knmi_harmonie_arome_netherlands&timezone=Europe%2FBerlin&wind_speed_unit=#{unit}"
   end
 
   defp normalize_degree(nil), do: nil
