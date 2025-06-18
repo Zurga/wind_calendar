@@ -674,27 +674,6 @@ let
         in
         drv;
 
-      icalendar =
-        let
-          version = "1.1.2";
-          drv = buildMix {
-            inherit version;
-            name = "icalendar";
-            appConfigPath = ./config;
-
-            src = fetchHex {
-              inherit version;
-              pkg = "icalendar";
-              sha256 = "2060f8e353fdf3047e95a3f012583dc3c0bbd7ca1010e32ed9e9fc5760ad4292";
-            };
-
-            beamDeps = [
-              timex
-            ];
-          };
-        in
-        drv;
-
       idna =
         let
           version = "6.1.1";
@@ -795,6 +774,28 @@ let
               pkg = "jumper";
               sha256 = "9b7782409021e01ab3c08270e26f36eb62976a38c1aa64b2eaf6348422f165e1";
             };
+          };
+        in
+        drv;
+
+      magical =
+        let
+          version = "1.0.1";
+          drv = buildMix {
+            inherit version;
+            name = "magical";
+            appConfigPath = ./config;
+
+            src = fetchHex {
+              inherit version;
+              pkg = "magical";
+              sha256 = "8b2512a986c263df3432ecea79e364bde9cf8370a8ec17ad93aec2f007007170";
+            };
+
+            beamDeps = [
+              nimble_parsec
+              timex
+            ];
           };
         in
         drv;
