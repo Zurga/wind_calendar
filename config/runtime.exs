@@ -51,7 +51,7 @@ if config_env() == :prod do
   server_aliases =
     case System.get_env("PHX_SERVER_ALIASES") do
       nil -> [host]
-      aliases -> String.split(aliases, ",")
+      aliases -> [host | String.split(aliases, ",")]
     end
     |> Enum.map(&"//#{&1}")
 
