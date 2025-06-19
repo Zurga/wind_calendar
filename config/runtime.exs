@@ -50,9 +50,10 @@ if config_env() == :prod do
 
   server_aliases =
     case System.get_env("PHX_SERVER_ALIASES") do
-      nil -> true
+      nil -> [host]
       aliases -> String.split(aliases, ",")
     end
+    |> Enum.map(&"//#{&1}")
 
   port = String.to_integer(System.get_env("PORT") || "4000")
 
@@ -68,7 +69,7 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
-    check_origin: :conn,
+    check_origin: server_aliases,
     secret_key_base: secret_key_base
 
   # ## SSL Support
