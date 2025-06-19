@@ -141,7 +141,7 @@ defmodule WindCalendarWeb.IndexLive do
           |> maybe_append("max_speed", max_speed)
           |> maybe_append("wind_direction", wind_directions)
 
-        "https://#{WindCalendarWeb.Endpoint.host()}/spot?#{url_params}"
+        "#{URI.to_string(socket.host_uri)}/spot?#{url_params}"
       end
 
     {:noreply,
