@@ -47,6 +47,13 @@ if config_env() == :prod do
       """
 
   host = System.get_env("PHX_HOST") || "example.com"
+
+  server_aliases =
+    case System.get_env("PHX_SERVER_ALIASES") do
+      nil -> true
+      aliases -> String.split(aliases, ",")
+    end
+
   port = String.to_integer(System.get_env("PORT") || "4000")
 
   config :wind_calendar, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
@@ -61,6 +68,7 @@ if config_env() == :prod do
       ip: {0, 0, 0, 0, 0, 0, 0, 0},
       port: port
     ],
+    check_origin: server_aliases,
     secret_key_base: secret_key_base
 
   # ## SSL Support
