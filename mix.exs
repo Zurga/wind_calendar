@@ -74,6 +74,8 @@ defmodule WindCalendar.MixProject do
       {:flop, "~> 0.25.0"},
       {:deps_nix, "~> 2.0", only: :dev},
       {:magical, "~> 1.0.1"},
+      {:error_tracker, "~> 0.6.0"},
+      {:tz_world, "~> 1.3"},
 
       # Testing deps
       {:skipper, "~> 0.3.0", only: @test_envs},

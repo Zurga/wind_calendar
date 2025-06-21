@@ -7,6 +7,7 @@ defmodule WindCalendar.Release do
 
   def migrate do
     load_app()
+    TzWorld.Downloader.update_release(true, false, false)
 
     for repo <- repos() do
       {:ok, _, _} = Ecto.Migrator.with_repo(repo, &Ecto.Migrator.run(&1, :up, all: true))
