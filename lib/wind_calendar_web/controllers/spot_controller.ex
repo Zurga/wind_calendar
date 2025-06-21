@@ -2,6 +2,7 @@ defmodule WindCalendarWeb.SpotController do
   use WindCalendarWeb.Controller
 
   alias WindCalendar.Directions
+  alias WindCalendar.Forecasters.KNMISeamless
   alias Magical.{Calendar, Event}
   @all_wind_directions 0..15
 
@@ -20,20 +21,20 @@ defmodule WindCalendarWeb.SpotController do
     wind_direction_format = Map.get(params, "indicator_direction", "follow")
     # ms, kn, mph 
     unit = Map.get(params, "unit", "ms")
+    start_time = Map.get(params, "start_time", "08:00:00") |> Time.from_iso8601!()
+    end_time = Map.get(params, "end_time", "20:00:00") |> Time.from_iso8601!()
+    timezone = Map.get(params, "timezone")
 
-    {:ok,
-     %{
-       body: %{
-         "hourly" => %{
-           "time" => datetimes,
-           "wind_speed_10m" => wind_speeds,
-           "wind_direction_10m" => wind_directions
-         }
-       }
-     }} = Req.get(forecast_url(lat, lon, unit))
+    # FIXME add forecaster based on either params or the lat and lon. 
+    %{
+      "time" => datetimes,
+      "wind_speed_10m" => wind_speeds,
+      "wind_direction_10m" => wind_directions
+    } = KNMISeamless.get_forecast(lat, lon, unit, timezone)
 
     calendar =
       Enum.map(datetimes, fn datetime_string ->
+        # FIXME Maybe add timezone here
         {:ok, datetime, 0} = DateTime.from_iso8601(datetime_string <> ":00Z")
         datetime
       end)
@@ -43,7 +44,8 @@ defmodule WindCalendarWeb.SpotController do
         wind_speed = Enum.at(wind_speeds, index)
         wind_direction = Enum.at(wind_directions, index) |> normalize_degree()
 
-        if time.hour > 8 and time.hour < 20 and wind_speed > min_speed and wind_speed < max_speed and
+        if time.hour >= start_time.hour and time.hour <= end_time.hour and wind_speed > min_speed and
+             wind_speed < max_speed and
              wind_direction in acceptable_wind_directions do
           event = %Event{
             summary:
@@ -62,10 +64,6 @@ defmodule WindCalendarWeb.SpotController do
 
     conn
     |> text(serialized)
-  end
-
-  def forecast_url(lat, lon, unit) do
-    "https://api.open-meteo.com/v1/forecast?latitude=#{lat}&longitude=#{lon}&hourly=wind_speed_10m,wind_direction_10m,wind_gusts_10m&models=knmi_harmonie_arome_netherlands&timezone=Europe%2FBerlin&wind_speed_unit=#{unit}"
   end
 
   defp normalize_degree(nil), do: nil

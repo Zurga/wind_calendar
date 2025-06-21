@@ -15,3 +15,9 @@
 .leaflet-control-zoom-out  {
   all: initial;
 }
+
+[role="group"] legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+}

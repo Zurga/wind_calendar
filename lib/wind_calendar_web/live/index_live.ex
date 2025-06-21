@@ -11,7 +11,8 @@ defmodule WindCalendarWeb.IndexLive do
     HiddenInput,
     Label,
     NumberInput,
-    TextInput
+    TextInput,
+    TimeInput
   }
 
   def mount(_, _, socket) do
@@ -21,7 +22,10 @@ defmodule WindCalendarWeb.IndexLive do
         "min_speed" => 0,
         "max_speed" => 90,
         "wind_directions" => nil,
-        "indicator_direction" => "follow"
+        "indicator_direction" => "follow",
+        "timezone" => "",
+        "start_time" => "09:00",
+        "end_time" => "21:00"
       })
 
     {:ok,
@@ -48,65 +52,89 @@ defmodule WindCalendarWeb.IndexLive do
             <button type="button" id="url-copy-button" :hook="Copy" data-value={@url}>Copy</button>
           </fieldset>
         {/if}
-        <fieldset>
-          <Field name={:indicator_direction}>
-            <Label>Wind indicator direction</Label>
-            <Select options={[
-              {"Following the wind (N): ↓", "follow"},
-              {"Into the wind (N): ↑", "into"},
-              {"Abbreviation: N", "abbreviation"}
-            ]} />
-          </Field>
-          <Field name={:wind_directions}>
-            <Label>Wind directions:</Label>
-            <div id="wind-directions">
-              {#for {value, label_map} <- @wind_direction_icon}
-                <Label>
-                  {#if is_nil(@form[:wind_directions].value)}
-                    <input
-                      type="checkbox"
-                      name="url_form[wind_directions][]"
-                      id={"url_form_wind_directions-#{value}"}
-                      value={value}
-                      checked
-                    />
-                  {#else}
-                    <input
-                      type="checkbox"
-                      name="url_form[wind_directions][]"
-                      id={"url_form_wind_directions-#{value}"}
-                      value={value}
-                      checked={to_string(value) in @form[:wind_directions].value}
-                    />
-                  {/if}
-                  {label_map[@form[:indicator_direction].value]}
-                  {#if @form[:indicator_direction].value != "abbreviation"}
-                    ({label_map["abbreviation"]})
-                  {/if}
-                </Label>
-              {/for}
-            </div>
-          </Field>
-          <Field name={:unit}>
-            <Label>Wind speed unit:</Label>
-            <Select options={[{"kn (Knots)", "kn"}, {"m/s", "ms"}, {"mph", "mph"}]} />
-          </Field>
-          <Field name={:min_speed}>
-            <Label>Minimum windspeed:</Label>
+        <div class="grid">
+          <div class="grid">
+            <Field name={:start_time}>
+              <Label>Start time</Label>
+              <TimeInput />
+            </Field>
+            <Field name={:end_time}>
+              <Label>End time</Label>
+              <TimeInput />
+            </Field>
+          </div>
+          <Field name={:timezone}>
+            <Label>Timezone</Label>
             <fieldset role="group">
-              <NumberInput />
-              <button disabled>{@form[:unit].value}</button>
+              <Select options={[{"Local", ""} | Tzdata.zone_list()]} />
             </fieldset>
           </Field>
-          <Field name={:max_speed}>
-            <Label>Maximum windspeed:</Label>
-            <fieldset role="group">
-              <NumberInput />
-              <button disabled>{@form[:unit].value}</button>
-            </fieldset>
-          </Field>
-        </fieldset>
+        </div>
+        <div class="grid">
+          <fieldset>
+            <Field name={:unit}>
+              <Label>Wind speed unit:</Label>
+              <Select options={[{"kn (Knots)", "kn"}, {"m/s", "ms"}, {"mph", "mph"}]} />
+            </Field>
+            <Field name={:min_speed}>
+              <Label>Minimum windspeed:</Label>
+              <fieldset role="group">
+                <NumberInput />
+                <button disabled>{@form[:unit].value}</button>
+              </fieldset>
+            </Field>
+            <Field name={:max_speed}>
+              <Label>Maximum windspeed:</Label>
+              <fieldset role="group">
+                <NumberInput />
+                <button disabled>{@form[:unit].value}</button>
+              </fieldset>
+            </Field>
+          </fieldset>
+          <fieldset>
+            <Field name={:indicator_direction}>
+              <Label>Wind indicator direction</Label>
+              <Select options={[
+                {"Following the wind (N): ↓", "follow"},
+                {"Into the wind (N): ↑", "into"},
+                {"Abbreviation: N", "abbreviation"}
+              ]} />
+            </Field>
+            <Field name={:wind_directions}>
+              <Label>Wind directions:</Label>
+              <div id="wind-directions">
+                {#for {value, label_map} <- @wind_direction_icon}
+                  <Label>
+                    {#if is_nil(@form[:wind_directions].value)}
+                      <input
+                        type="checkbox"
+                        name="url_form[wind_directions][]"
+                        id={"url_form_wind_directions-#{value}"}
+                        value={value}
+                        checked
+                      />
+                    {#else}
+                      <input
+                        type="checkbox"
+                        name="url_form[wind_directions][]"
+                        id={"url_form_wind_directions-#{value}"}
+                        value={value}
+                        checked={to_string(value) in @form[:wind_directions].value}
+                      />
+                    {/if}
+                    {label_map[@form[:indicator_direction].value]}
+                    {#if @form[:indicator_direction].value != "abbreviation"}
+                      ({label_map["abbreviation"]})
+                    {/if}
+                  </Label>
+                {/for}
+              </div>
+            </Field>
+          </fieldset>
+        </div>
       </Form>
+      <footer>
+      </footer>
     </article>
     """
   end
@@ -126,30 +154,43 @@ defmodule WindCalendarWeb.IndexLive do
         },
         socket
       ) do
-    url =
-      if latlon == "" do
-        nil
-      else
-        [lat, lon] = String.split(latlon, ",")
+    [lat, lon] =
+      latlon
+      |> String.split(",")
+      |> Enum.map(&(Float.parse(&1) |> elem(0)))
 
-        wind_directions =
-          Map.get(params, "wind_directions", [])
+    IO.inspect(params)
+    # We add the timezone if it is not included in the params based on the latitude and longitude
+    params =
+      Map.update!(params, "timezone", fn timezone ->
+        if params["clear_timezone"] == "true" or timezone == "" do
+          case TzWorld.timezone_at({lon, lat}) do
+            {:ok, timezone} -> timezone
+            {:error, _} -> ""
+          end
+        else
+          timezone
+        end
+      end)
+      |> IO.inspect()
 
-        url_params =
-          "unit=#{unit}&lat=#{lat}&lon=#{lon}&indicator_direction=#{indicator_direction}"
-          |> maybe_append("min_speed", min_speed)
-          |> maybe_append("max_speed", max_speed)
-          |> maybe_append("wind_direction", wind_directions)
+    wind_directions =
+      Map.get(params, "wind_directions", [])
 
-        "#{URI.to_string(socket.host_uri)}/spot?#{url_params}"
-      end
+    url_params =
+      "unit=#{unit}&lat=#{lat}&lon=#{lon}&indicator_direction=#{indicator_direction}&timezone=#{params["timezone"]}"
+      |> maybe_append("min_speed", min_speed)
+      |> maybe_append("max_speed", max_speed)
+      |> maybe_append("wind_direction", wind_directions)
+
+    url = "#{URI.to_string(socket.host_uri)}/spot?#{url_params}"
 
     {:noreply,
      socket
      |> assign(url: url, form: url_form(params))}
   end
 
-  defp url_form(params), do: to_form(params, as: :url_form)
+  defp url_form(params), do: to_form(params, as: :url_form) |> IO.inspect()
 
   defp maybe_append(params, _key, ""), do: params
 
