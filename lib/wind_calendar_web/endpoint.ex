@@ -16,7 +16,8 @@ defmodule WindCalendarWeb.Endpoint do
   ]
 
   socket "/live", Phoenix.LiveView.Socket,
-    websocket: [connect_info: [:user_agent, session: @session_options], compress: true]
+    websocket: [connect_info: [:user_agent, session: @session_options], compress: true], 
+    longpoll: true
 
   # Serve at "/" the static files from "priv/static" directory.
   #

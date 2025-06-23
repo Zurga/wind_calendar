@@ -1,2 +1,23 @@
 /* This file is for your main application CSS */
 @import url("./pico.css");
+@import url("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
+#map { height: 50vh; }
+
+#wind-directions {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+}
+#map [role="button"]:not(.leaflet-control-zoom-in):not(.leaflet-control-zoom-out) {
+  all: initial;
+}
+
+.leaflet-control-zoom-in,  
+.leaflet-control-zoom-out  {
+  all: initial;
+}
+
+[role="group"] legend {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 100%;
+}

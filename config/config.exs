@@ -31,6 +31,10 @@ config :wind_calendar, WindCalendarWeb.Endpoint,
 # at the `config/runtime.exs`.
 config :wind_calendar, WindCalendar.Mailer, adapter: Swoosh.Adapters.Local
 
+config :tzdata, :data_dir, "/tmp"
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+config :tz_world, backend: TzWorld.Backend.EtsWithIndexCache, data_dir: "/tmp"
+
 # Configure esbuild (the version is required)
 config :esbuild,
   version: "0.17.11",

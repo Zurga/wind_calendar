@@ -423,6 +423,33 @@ let
         in
         drv;
 
+      error_tracker =
+        let
+          version = "0.6.0";
+          drv = buildMix {
+            inherit version;
+            name = "error_tracker";
+            appConfigPath = ./config;
+
+            src = fetchHex {
+              inherit version;
+              pkg = "error_tracker";
+              sha256 = "8b99db5abeb883e7d622daf850c4dda38ce3bfabc4455431212d698df3156c63";
+            };
+
+            beamDeps = [
+              ecto
+              ecto_sql
+              jason
+              phoenix_ecto
+              phoenix_live_view
+              plug
+              postgrex
+            ];
+          };
+        in
+        drv;
+
       esbuild =
         let
           version = "0.10.0";
@@ -576,6 +603,27 @@ let
         in
         drv;
 
+      geo =
+        let
+          version = "4.0.1";
+          drv = buildMix {
+            inherit version;
+            name = "geo";
+            appConfigPath = ./config;
+
+            src = fetchHex {
+              inherit version;
+              pkg = "geo";
+              sha256 = "32eb624feff75d043bbdd43f67e3869c5fc729e221333271b07cdc98ba98563d";
+            };
+
+            beamDeps = [
+              jason
+            ];
+          };
+        in
+        drv;
+
       gettext =
         let
           version = "0.26.2";
@@ -670,27 +718,6 @@ let
               pkg = "html_entities";
               sha256 = "c53ba390403485615623b9531e97696f076ed415e8d8058b1dbaa28181f4fdcc";
             };
-          };
-        in
-        drv;
-
-      icalendar =
-        let
-          version = "1.1.2";
-          drv = buildMix {
-            inherit version;
-            name = "icalendar";
-            appConfigPath = ./config;
-
-            src = fetchHex {
-              inherit version;
-              pkg = "icalendar";
-              sha256 = "2060f8e353fdf3047e95a3f012583dc3c0bbd7ca1010e32ed9e9fc5760ad4292";
-            };
-
-            beamDeps = [
-              timex
-            ];
           };
         in
         drv;
@@ -795,6 +822,28 @@ let
               pkg = "jumper";
               sha256 = "9b7782409021e01ab3c08270e26f36eb62976a38c1aa64b2eaf6348422f165e1";
             };
+          };
+        in
+        drv;
+
+      magical =
+        let
+          version = "1.0.1";
+          drv = buildMix {
+            inherit version;
+            name = "magical";
+            appConfigPath = ./config;
+
+            src = fetchHex {
+              inherit version;
+              pkg = "magical";
+              sha256 = "8b2512a986c263df3432ecea79e364bde9cf8370a8ec17ad93aec2f007007170";
+            };
+
+            beamDeps = [
+              nimble_parsec
+              timex
+            ];
           };
         in
         drv;
@@ -1323,7 +1372,7 @@ let
 
       punkix =
         let
-          version = "e8dfea74a5fb62c91bd6fb7da9e238a5a405298b";
+          version = "9a5610baf8b680f4936671efe2e9bd7b33f51735";
           drv = buildMix {
             inherit version;
             name = "punkix";
@@ -1332,8 +1381,8 @@ let
             src = pkgs.fetchFromGitHub {
               owner = "Zurga";
               repo = "punkix";
-              rev = "e8dfea74a5fb62c91bd6fb7da9e238a5a405298b";
-              hash = "sha256-r4RWAVHqcG4XxEB/GOjKtbiTCX5Hep9oGFSNfwGER8c=";
+              rev = "9a5610baf8b680f4936671efe2e9bd7b33f51735";
+              hash = "sha256-5fkeJjH9pZpXe3p33Ur+m87LKPX3GfT1DhCu3ixo0Ss=";
             };
 
             beamDeps = [
@@ -1700,6 +1749,30 @@ let
 
             beamDeps = [
               ecto
+            ];
+          };
+        in
+        drv;
+
+      tz_world =
+        let
+          version = "1.4.1";
+          drv = buildMix {
+            inherit version;
+            name = "tz_world";
+            appConfigPath = ./config;
+
+            src = fetchHex {
+              inherit version;
+              pkg = "tz_world";
+              sha256 = "9173ba7aa7c5e627e23adfc0c8d001a56a7072d5bdc8d3a94e4cd44e25decba1";
+            };
+
+            beamDeps = [
+              castore
+              certifi
+              geo
+              jason
             ];
           };
         in
