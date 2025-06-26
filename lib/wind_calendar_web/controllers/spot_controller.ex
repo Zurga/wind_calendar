@@ -19,13 +19,13 @@ defmodule WindCalendarWeb.SpotController do
     min_speed = Map.get(params, "min_speed", "0") |> String.to_integer()
     max_speed = Map.get(params, "max_speed", "9999") |> String.to_integer()
     wind_direction_format = Map.get(params, "indicator_direction", "follow")
-    # ms, kn, mph 
+    # ms, kn, mph
     unit = Map.get(params, "unit", "ms")
     start_time = Map.get(params, "start_time", "08:00:00") |> Time.from_iso8601!()
     end_time = Map.get(params, "end_time", "20:00:00") |> Time.from_iso8601!()
     timezone = Map.get(params, "timezone")
 
-    # FIXME add forecaster based on either params or the lat and lon. 
+    # FIXME add forecaster based on either params or the lat and lon.
     %{
       "time" => datetimes,
       "wind_speed_10m" => wind_speeds,

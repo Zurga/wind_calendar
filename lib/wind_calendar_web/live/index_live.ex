@@ -3,6 +3,7 @@ defmodule WindCalendarWeb.IndexLive do
 
   alias WindCalendar.Directions
   alias Surface.Components.Form
+  alias WindCalendar.CalendarPreview
 
   alias Surface.Components.Form.{
     Checkbox,
@@ -20,7 +21,7 @@ defmodule WindCalendarWeb.IndexLive do
       url_form(%{
         "unit" => "ms",
         "min_speed" => 0,
-        "max_speed" => 90,
+        "max_speed" => 40,
         "wind_directions" => nil,
         "indicator_direction" => "follow",
         "timezone" => "",
@@ -30,7 +31,12 @@ defmodule WindCalendarWeb.IndexLive do
 
     {:ok,
      socket
-     |> assign(form: initial_form, url: nil, wind_direction_icon: Directions.directions())}
+     |> assign(
+       form: initial_form,
+       url: nil,
+       wind_direction_icon: Directions.directions(),
+       calendar_events: Map.new()
+     )}
   end
 
   def render(assigns) do
@@ -136,6 +142,33 @@ defmodule WindCalendarWeb.IndexLive do
       <footer>
       </footer>
     </article>
+    <h3>ICS Calendar Preview</h3>
+
+    <table>
+      <thead>
+        <tr>
+          {#for date <- Map.keys(@calendar_events)}
+            <th>{date}</th>
+          {/for}
+        </tr>
+      </thead>
+      <tbody>
+        {#for time <- all_times(@calendar_events)}
+          <tr>
+            {#for date <- Map.keys(@calendar_events)}
+              <td>
+                {#for event <- events_at_time(@calendar_events[date], time)}
+                  <div>
+                    <strong>{Calendar.strftime(event.start_date, "%H:%M")}</strong>:
+                    {event.summary}
+                  </div>
+                {/for}
+              </td>
+            {/for}
+          </tr>
+        {/for}
+      </tbody>
+    </table>
     """
   end
 
@@ -159,7 +192,6 @@ defmodule WindCalendarWeb.IndexLive do
       |> String.split(",")
       |> Enum.map(&(Float.parse(&1) |> elem(0)))
 
-    IO.inspect(params)
     # We add the timezone if it is not included in the params based on the latitude and longitude
     params =
       Map.update!(params, "timezone", fn timezone ->
@@ -185,12 +217,21 @@ defmodule WindCalendarWeb.IndexLive do
 
     url = "#{URI.to_string(socket.host_uri)}/spot?#{url_params}"
 
+    IO.inspect(wind_directions)
+    raw_ics = CalendarPreview.fetch_and_parse_ics(url)
+
+    grouped_events = parse_ics_events(raw_ics) |> group_events_by_date()
+
     {:noreply,
      socket
-     |> assign(url: url, form: url_form(params))}
+     |> assign(
+       url: url,
+       form: url_form(params),
+       calendar_events: grouped_events
+     )}
   end
 
-  defp url_form(params), do: to_form(params, as: :url_form) |> IO.inspect()
+  defp url_form(params), do: to_form(params, as: :url_form)
 
   defp maybe_append(params, _key, ""), do: params
 
@@ -199,4 +240,42 @@ defmodule WindCalendarWeb.IndexLive do
   end
 
   defp maybe_append(params, key, value), do: params <> "&#{key}=#{value}"
+
+  defp parse_ics_events(ics_string) do
+    case Magical.from_ics(ics_string) do
+      {:ok, %Magical.Calendar{} = calendar} ->
+        # Map your Magical.Calendar events to the shape you want for rendering
+        Enum.map(calendar.events, fn %Magical.Event{} = event ->
+          %{
+            summary: event.summary,
+            start_date: event.dtstart,
+            end_date: event.dtend
+          }
+        end)
+
+      {:error, reason} ->
+        IO.inspect(reason, label: "ICS parse error")
+        []
+    end
+  end
+
+  defp events_at_time(events, time) do
+    Enum.filter(events, fn event ->
+      Calendar.strftime(event.start_date, "%H:%M") == time
+    end)
+  end
+
+  defp group_events_by_date(events) do
+    events
+    |> Enum.group_by(fn event -> Calendar.strftime(event.start_date, "%Y-%m-%d") end)
+  end
+
+  defp all_times(grouped_events) do
+    grouped_events
+    |> Map.values()
+    |> List.flatten()
+    |> Enum.map(&Calendar.strftime(&1.start_date, "%H:%M"))
+    |> Enum.uniq()
+    |> Enum.sort()
+  end
 end
