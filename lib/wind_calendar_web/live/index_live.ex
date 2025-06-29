@@ -142,6 +142,7 @@ defmodule WindCalendarWeb.IndexLive do
       <footer>
       </footer>
     </article>
+    <WindCalendarWeb.WindRose id="1" />
     <h3>ICS Calendar Preview</h3>
 
     <table>
