@@ -1,6 +1,6 @@
 { config, lib, ... }:
 let
-  appName = "wind_calendar";
+  appName = "weather_calendar";
   phoenixNix = builtins.fetchGit { url = "https://github.com/Zurga/phoenix_nix"; rev = "5de9ee5d1d98519ec650fa960371e4b0ca8d5500"; };
   phoenixService = import "${phoenixNix}/phoenix.nix" {
     inherit lib config appName;

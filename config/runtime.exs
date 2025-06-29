@@ -12,12 +12,12 @@ import Config
 # If you use `mix release`, you need to explicitly enable the server
 # by passing the PHX_SERVER=true when you start it:
 #
-#     PHX_SERVER=true bin/wind_calendar start
+#     PHX_SERVER=true bin/weather_calendar start
 #
 # Alternatively, you can use `mix phx.gen.release` to generate a `bin/server`
 # script that automatically sets the env var above.
 if System.get_env("PHX_SERVER") do
-  config :wind_calendar, WindCalendarWeb.Endpoint, server: true
+  config :weather_calendar, WeatherCalendarWeb.Endpoint, server: true
 end
 
 if config_env() == :prod do
@@ -27,7 +27,7 @@ if config_env() == :prod do
       environment variable DATABASE is missing."
       """
 
-  config :wind_calendar, WindCalendar.Repo,
+  config :weather_calendar, WeatherCalendar.Repo,
     database: database,
     hostname: "/run/postgresql",
     socket_dir: "/run/postgresql",
@@ -57,9 +57,9 @@ if config_env() == :prod do
 
   port = String.to_integer(System.get_env("PORT") || "4000")
 
-  config :wind_calendar, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
+  config :weather_calendar, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
 
-  config :wind_calendar, WindCalendarWeb.Endpoint,
+  config :weather_calendar, WeatherCalendarWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
       # Enable IPv6 and bind on all interfaces.
@@ -77,7 +77,7 @@ if config_env() == :prod do
   # To get SSL working, you will need to add the `https` key
   # to your endpoint configuration:
   #
-  #     config :wind_calendar, WindCalendarWeb.Endpoint,
+  #     config :weather_calendar, WeatherCalendarWeb.Endpoint,
   #       https: [
   #         ...,
   #         port: 443,
@@ -99,7 +99,7 @@ if config_env() == :prod do
   # We also recommend setting `force_ssl` in your config/prod.exs,
   # ensuring no data is ever sent via http, always redirecting to https:
   #
-  #     config :wind_calendar, WindCalendarWeb.Endpoint,
+  #     config :weather_calendar, WeatherCalendarWeb.Endpoint,
   #       force_ssl: [hsts: true]
   #
   # Check `Plug.SSL` for all available options in `force_ssl`.
@@ -110,7 +110,7 @@ if config_env() == :prod do
   # Also, you may need to configure the Swoosh API client of your choice if you
   # are not using SMTP. Here is an example of the configuration:
   #
-  #     config :wind_calendar, WindCalendar.Mailer,
+  #     config :weather_calendar, WeatherCalendar.Mailer,
   #       adapter: Swoosh.Adapters.Mailgun,
   #       api_key: System.get_env("MAILGUN_API_KEY"),
   #       domain: System.get_env("MAILGUN_DOMAIN")

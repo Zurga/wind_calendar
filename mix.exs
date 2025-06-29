@@ -1,11 +1,11 @@
-defmodule WindCalendar.MixProject do
+defmodule WeatherCalendar.MixProject do
   use Mix.Project
 
   @test_envs ~w/test integration_test/a
 
   def project do
     [
-      app: :wind_calendar,
+      app: :weather_calendar,
       version: "0.1.0",
       elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -22,7 +22,7 @@ defmodule WindCalendar.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {WindCalendar.Application, []},
+      mod: {WeatherCalendar.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -108,9 +108,9 @@ defmodule WindCalendar.MixProject do
       "test.all": ["test", "integration_test"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["esbuild.install --if-missing"],
-      "assets.build": ["esbuild wind_calendar"],
+      "assets.build": ["esbuild weather_calendar"],
       "assets.deploy": [
-        "esbuild wind_calendar --minify",
+        "esbuild weather_calendar --minify",
         "phx.digest"
       ],
       "deps.get": ["deps.get", "deps.nix"],

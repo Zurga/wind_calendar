@@ -2,4 +2,4 @@
 set -eu
 
 cd -P -- "$(dirname -- "$0")"
-PHX_SERVER=true exec ./wind_calendar start
+PHX_SERVER=true exec ./weather_calendar start

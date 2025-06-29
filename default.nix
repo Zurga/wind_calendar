@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> { }, port ? 4000, appName ? "wind_calendar", branch ? "main", commit ? "", ... }:
+{ pkgs ? import <nixpkgs> { }, port ? 4000, appName ? "weather_calendar", branch ? "main", commit ? "", ... }:
 let
   beamPackages = pkgs.beamPackages;
   inherit (beamPackages) mixRelease;
@@ -13,7 +13,7 @@ let
   };
 
   # This will use the current directory as source
-  nodeDependencies = (pkgs.callPackage "${src}/assets/default.nix" { }).shell.nodeDependencies;
+  # nodeDependencies = (pkgs.callPackage "${src}/assets/default.nix" { }).shell.nodeDependencies;
 in 
 mixRelease {
   inherit src mixNixDeps;
@@ -29,8 +29,8 @@ mixRelease {
 
 
   # Re-add the following line to postBuild if you have nodeDependencies
+   # ln -sf ${nodeDependencies}/lib/node_modules assets/node_modules
   postBuild = ''
-    ln -sf ${nodeDependencies}/lib/node_modules assets/node_modules
     cp ${pkgs.esbuild}/bin/esbuild _build/esbuild-linux-x64
 
     # for external task you need a workaround for the no deps check flag

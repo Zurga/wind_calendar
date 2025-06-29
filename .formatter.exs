@@ -3,10 +3,10 @@
   subdirectories: ["priv/*/migrations"],
   plugins: [Surface.Formatter.Plugin],
   inputs: [
-    "*.{heex, sface,ex,exs}", 
+    "*.{heex, sface,ex,exs}",
     "{config,lib,test}/**/*.{heex, sface, ex,exs}",
-    "*.{ex,exs}", 
-    "{config,lib,test}/**/*.{ex,exs}", 
+    "*.{ex,exs}",
+    "{config,lib,test}/**/*.{ex,exs}",
     "priv/*/seeds.exs"
   ]
 ]

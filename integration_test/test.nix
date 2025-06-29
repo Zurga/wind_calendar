@@ -6,10 +6,10 @@ in
   nodes = {
     vm = {lib, pkgs, nodes, ...}: {
       imports = [ ../service.nix ];
-      services.wind_calendar = {
+      services.weather_calendar = {
         enable = true;
-        migrateCommand = "WindCalendar.Release.migrate";
-        seedCommand = "WindCalendar.Release.seed";
+        migrateCommand = "WeatherCalendar.Release.migrate";
+        seedCommand = "WeatherCalendar.Release.seed";
         environments = {
           prod = {
             host = "localhost";
@@ -23,8 +23,8 @@ in
   testScript = ''
     vm.start()
     print(vm.execute("ls /etc/systemd/system/"))
-    vm.wait_for_unit("wind_calendar_seed")
-    vm.wait_for_unit("wind_calendar_prod")
+    vm.wait_for_unit("weather_calendar_seed")
+    vm.wait_for_unit("weather_calendar_prod")
     vm.shell_interact()          # Open an interactive shell in the VM (drop-in login shell)
   '';
 }

@@ -1,11 +1,11 @@
 import Config
 
 # Configure your database
-config :wind_calendar, WindCalendar.Repo,
+config :weather_calendar, WeatherCalendar.Repo,
   username: "postgres",
   password: "postgres",
   hostname: "localhost",
-  database: "wind_calendar_dev",
+  database: "weather_calendar_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
@@ -16,7 +16,7 @@ config :wind_calendar, WindCalendar.Repo,
 # The watchers configuration can be used to run external
 # watchers to your application. For example, we can use it
 # to bundle .js and .css sources.
-config :wind_calendar, WindCalendarWeb.Endpoint,
+config :weather_calendar, WeatherCalendarWeb.Endpoint,
   # Binding to loopback ipv4 address prevents access from other machines.
   # Change to `ip: {0, 0, 0, 0}` to allow access from other machines.
   http: [ip: {127, 0, 0, 1}, port: 4000],
@@ -25,7 +25,7 @@ config :wind_calendar, WindCalendarWeb.Endpoint,
   debug_errors: true,
   secret_key_base: "jIXe4WUEPgW+JTcMvEBpyZ1YHt2rjxIztpnNzWGn+g+latesWvFl7XX7NSUZwV38",
   watchers: [
-    esbuild: {Esbuild, :install_and_run, [:wind_calendar, ~w(--sourcemap=inline --watch)]},
+    esbuild: {Esbuild, :install_and_run, [:weather_calendar, ~w(--sourcemap=inline --watch)]},
     esbuild: {Esbuild, :install_and_run, [:catalogue, ~w(--sourcemap=inline --watch)]}
   ]
 
@@ -53,19 +53,20 @@ config :wind_calendar, WindCalendarWeb.Endpoint,
 # different ports.
 
 # Watch static and templates for browser reloading.
-config :wind_calendar, WindCalendarWeb.Endpoint,
+config :weather_calendar, WeatherCalendarWeb.Endpoint,
   reloadable_compilers: [:phoenix, :elixir, :surface],
   live_reload: [
     patterns: [
       ~r"priv/static/(?!uploads/).*(js|css|png|jpeg|jpg|gif|svg)$",
       ~r"priv/gettext/.*(po)$",
-      ~r"lib/wind_calendar_web/(controllers|live|components)/.*(ex|heex|sface|js)$",
+      ~r"lib/*.ex",
+      ~r"lib/weather_calendar_web/(controllers|live|components)/.*(ex|heex|sface|js)$",
       ~r"priv/catalogue/.*(ex)$"
     ]
   ]
 
 # Enable dev routes for dashboard and mailbox
-config :wind_calendar, dev_routes: true
+config :weather_calendar, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
 config :logger, :console, format: "[$level] $message\n"
