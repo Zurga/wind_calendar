@@ -3,7 +3,7 @@ defmodule WeatherCalendarWeb.IndexLive do
 
   alias WeatherCalendar.{WindCalendar, Directions, Timezone}
   alias Surface.Components.Form
-
+  alias WeatherCalendarWeb.Components.WindDirection
   alias Surface.Components.Form.{
     Field,
     Select,
