@@ -1,29 +1,12 @@
 defmodule WeatherCalendarWeb.Components.WindDirection do
   use WeatherCalendarWeb.Component
 
+  prop selected_directions, :list, default: []
+
   def render(assigns) do
     ~F"""
-    <head>
-      <meta charset="UTF-8">
-      <title>Wind Rose Compass</title>
-      <style>
-        div {
-        background: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        }
-
-        canvas {
-        cursor: pointer;
-        }
-      </style>
-    </head>
-    <div>
-      <canvas id="compass" width="512" height="512" />
-
+    <div class="wind-compass-container">
+      <canvas id="compass" class="wind-compass-canvas" width="512" height="512" />
       <script>
       const canvas = document.getElementById("compass");
       const ctx = canvas.getContext("2d");

@@ -4,6 +4,7 @@ defmodule WeatherCalendarWeb.IndexLive do
   alias WeatherCalendar.{WindCalendar, Directions, Timezone}
   alias Surface.Components.Form
   alias WeatherCalendarWeb.Components.WindDirection
+
   alias Surface.Components.Form.{
     Field,
     Select,
@@ -106,6 +107,7 @@ defmodule WeatherCalendarWeb.IndexLive do
             </Field>
             <Field name={:wind_directions}>
               <Label>Wind directions:</Label>
+              <WindDirection />
               <div id="wind-directions">
                 {#for {value, label_map} <- @wind_direction_icon}
                   <Label>

@@ -21,3 +21,16 @@
   grid-template-columns: 1fr 1fr;
   width: 100%;
 }
+
+.wind-compass-container {
+  background: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+
+.wind-compass-canvas {
+  cursor: pointer;
+}
