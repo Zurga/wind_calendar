@@ -3,7 +3,6 @@ defmodule WeatherCalendarWeb.IndexLive do
 
   alias WeatherCalendar.{WindCalendar, Directions, Timezone}
   alias Surface.Components.Form
-  alias WeatherCalendarWeb.Components.WindDirection
 
   alias Surface.Components.Form.{
     Field,
@@ -28,13 +27,18 @@ defmodule WeatherCalendarWeb.IndexLive do
         "end_time" => "21:00:00"
       })
 
+    directions = Directions.directions()
+    abbreviations = directions |> Map.values() |> Enum.map(& &1["abbreviation"])
+
     {:ok,
      socket
      |> assign(
        form: initial_form,
        url: nil,
        wind_direction_icon: Directions.directions(),
-       calendar_events: Map.new()
+       calendar_events: Map.new(),
+       wind_direction_labels: abbreviations,
+       selected_wind_directions: Directions.directions()
      )}
   end
 
@@ -107,34 +111,16 @@ defmodule WeatherCalendarWeb.IndexLive do
             </Field>
             <Field name={:wind_directions}>
               <Label>Wind directions:</Label>
-              <WindDirection />
-              <div id="wind-directions">
-                {#for {value, label_map} <- @wind_direction_icon}
-                  <Label>
-                    {#if is_nil(@form[:wind_directions].value)}
-                      <input
-                        type="checkbox"
-                        name="url_form[wind_directions][]"
-                        id={"url_form_wind_directions-#{value}"}
-                        value={value}
-                        checked
-                      />
-                    {#else}
-                      <input
-                        type="checkbox"
-                        name="url_form[wind_directions][]"
-                        id={"url_form_wind_directions-#{value}"}
-                        value={value}
-                        checked={to_string(value) in @form[:wind_directions].value}
-                      />
-                    {/if}
-                    {label_map[@form[:indicator_direction].value]}
-                    {#if @form[:indicator_direction].value != "abbreviation"}
-                      ({label_map["abbreviation"]})
-                    {/if}
-                  </Label>
-                {/for}
+              <div class="wind-compass-container">
+                <canvas
+                  id="wind-directions"
+                  class="wind-compass-canvas"
+                  width="512"
+                  height="512"
+                  :hook="WindCompassHook"
+                />
               </div>
+              <HiddenInput />
             </Field>
           </fieldset>
         </div>

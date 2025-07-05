@@ -1,18 +1,22 @@
 /* This file is for your main application CSS */
 @import url("./pico.css");
 @import url("https://unpkg.com/leaflet@1.9.4/dist/leaflet.css");
-#map { height: 50vh; }
+
+#map {
+  height: 50vh;
+}
 
 #wind-directions {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
+
 #map [role="button"]:not(.leaflet-control-zoom-in):not(.leaflet-control-zoom-out) {
   all: initial;
 }
 
-.leaflet-control-zoom-in,  
-.leaflet-control-zoom-out  {
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
   all: initial;
 }
 
@@ -22,15 +26,26 @@
   width: 100%;
 }
 
+:root {
+  color-scheme: dark;
+  --pico-background-color: rgb(19, 22.5, 30.5);
+  --pico-color: #c2c7d0;
+  --pico-text-selection-color: rgba(144, 158, 190, 0.1875);
+  --pico-muted-color: #7b8495;
+}
+
 .wind-compass-container {
-  background: white;
+  background: var(--pico-background-color);
+  color: var(--pico-color);
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 512;
   margin: 0;
 }
 
 .wind-compass-canvas {
   cursor: pointer;
+  background-color: var(--pico-background-color);
+  color: var(--pico-color);
 }
