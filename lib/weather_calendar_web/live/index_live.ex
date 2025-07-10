@@ -52,7 +52,6 @@ defmodule WeatherCalendarWeb.IndexLive do
             <HiddenInput />
           </Field>
         </div>
-        <label>Copy this url to create a new calendar</label>
         {#if !@url}
           <p aria-busy="true">Click a location on the map</p>
         {#else}
@@ -109,19 +108,13 @@ defmodule WeatherCalendarWeb.IndexLive do
                 {"Abbreviation: N", "abbreviation"}
               ]} />
             </Field>
-            <Field name={:wind_directions}>
-              <Label>Wind directions:</Label>
-              <div class="wind-compass-container">
-                <canvas
-                  id="wind-directions"
-                  class="wind-compass-canvas"
-                  width="512"
-                  height="512"
-                  :hook="WindCompassHook"
-                />
-              </div>
-              <HiddenInput />
-            </Field>
+            <Label>Wind directions:</Label>
+            <div id="wind-compass" class="wind-compass-container" :hook="WindCompassHook" phx-update="ignore">
+              <canvas id="wind-directions" class="wind-compass-canvas" width="512" height="512" />
+              <Field name={:wind_directions}>
+                <HiddenInput />
+              </Field>
+            </div>
           </fieldset>
         </div>
       </Form>
@@ -196,6 +189,9 @@ defmodule WeatherCalendarWeb.IndexLive do
 
     wind_directions =
       Map.get(params, "wind_directions", [])
+      |> String.split(",")
+      |> Enum.map(&Directions.abbreviation_to_index/1)
+      |> Enum.reject(&is_nil/1)
 
     url_params =
       "unit=#{unit}&lat=#{lat}&lon=#{lon}&indicator_direction=#{indicator_direction}&timezone=#{params["timezone"]}"

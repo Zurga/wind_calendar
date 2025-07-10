@@ -40,6 +40,15 @@ defmodule WeatherCalendar.Directions do
     @wind_direction_icon[direction][format]
   end
 
+  def abbreviation_to_index(abbr) do
+    @wind_direction_icon
+    |> Enum.find(fn {_k, v} -> v["abbreviation"] == abbr end)
+    |> case do
+      {index, _} -> index
+      nil -> nil
+    end
+  end
+
   def normalize_degree(nil), do: nil
   def normalize_degree(degree), do: rem(round(degree / 22.5), 16)
 end
