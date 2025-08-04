@@ -2,6 +2,7 @@ defmodule WeatherCalendarWeb.IndexLive do
   use WeatherCalendarWeb.LiveView
 
   alias WeatherCalendar.{WindCalendar, Directions, Timezone}
+  alias WeatherCalendarWeb.Components.WindRose
   alias Surface.Components.Form
 
   alias Surface.Components.Form.{
@@ -106,33 +107,7 @@ defmodule WeatherCalendarWeb.IndexLive do
             </Field>
             <Field name={:wind_directions}>
               <Label>Wind directions:</Label>
-              <div id="wind-directions">
-                {#for {value, label_map} <- @wind_direction_icon}
-                  <Label>
-                    {#if is_nil(@form[:wind_directions].value)}
-                      <input
-                        type="checkbox"
-                        name="url_form[wind_directions][]"
-                        id={"url_form_wind_directions-#{value}"}
-                        value={value}
-                        checked
-                      />
-                    {#else}
-                      <input
-                        type="checkbox"
-                        name="url_form[wind_directions][]"
-                        id={"url_form_wind_directions-#{value}"}
-                        value={value}
-                        checked={to_string(value) in @form[:wind_directions].value}
-                      />
-                    {/if}
-                    {label_map[@form[:indicator_direction].value]}
-                    {#if @form[:indicator_direction].value != "abbreviation"}
-                      ({label_map["abbreviation"]})
-                    {/if}
-                  </Label>
-                {/for}
-              </div>
+              <WindRose id="windrose" />
             </Field>
           </fieldset>
         </div>
