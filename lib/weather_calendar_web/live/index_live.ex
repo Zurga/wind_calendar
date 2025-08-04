@@ -183,6 +183,7 @@ defmodule WeatherCalendarWeb.IndexLive do
 
     wind_directions =
       Map.get(params, "wind_directions", [])
+      |> String.split(",")
 
     url_params =
       "unit=#{unit}&lat=#{lat}&lon=#{lon}&indicator_direction=#{indicator_direction}&timezone=#{params["timezone"]}"
@@ -193,7 +194,9 @@ defmodule WeatherCalendarWeb.IndexLive do
     url = "#{URI.to_string(socket.host_uri)}/spot?#{url_params}"
 
     grouped_events =
-      WindCalendar.Params.new(params)
+      params
+      |> Map.put("wind_direction", wind_directions)
+      |> WindCalendar.Params.new()
       |> WindCalendar.generate_calendar()
       |> group_events_by_date()
 
